@@ -16,13 +16,16 @@ internal sealed class DemoService(GremlinServer server, GremlinClient client) : 
     {
         {
             var gremlinQuery = $@"
-                g.addV('product')
-                 .property('id', '68719518391')
-                 .property('Category', 'gear-surf-surfboards')
-                 .property('Name', 'Yamba Surfboard')
-                 .property('Quantity', 10)
-                 .property('Price', 300)
-                 .property('Clearance', true)
+                g.V().has('product', 'id', '68719518371').fold().coalesce(
+                    unfold(),
+                    addV('product')
+                        .property('id', '68719518391')
+                        .property('Category', 'gear-surf-surfboards')
+                        .property('Name', 'Yamba Surfboard')
+                        .property('Quantity', 10)
+                        .property('Price', 300)
+                        .property('Clearance', true)
+                )
             ";
             await client.SubmitAsync(
                 requestScript: gremlinQuery
@@ -33,13 +36,16 @@ internal sealed class DemoService(GremlinServer server, GremlinClient client) : 
 
         {
             string gremlinQuery = $@"
-                g.addV('product')
-                 .property('id', '68719518371')
-                 .property('Category', 'gear-surf-surfboards')
-                 .property('Name', 'Kiama Classic Surfboard')
-                 .property('Quantity', 25)
-                 .property('Price', 790.00)
-                 .property('Clearance', false)
+                g.V().has('product', 'id', '68719518371').fold().coalesce(
+                    unfold(),
+                    addV('product')
+                        .property('id', '68719518371')
+                        .property('Category', 'gear-surf-surfboards')
+                        .property('Name', 'Kiama Classic Surfboard')
+                        .property('Quantity', 25)
+                        .property('Price', 790.00)
+                        .property('Clearance', false)
+                )
             ";
             await client.SubmitAsync(
                 requestScript: gremlinQuery
@@ -52,24 +58,24 @@ internal sealed class DemoService(GremlinServer server, GremlinClient client) : 
             string gremlinQuery = $@"
                 g.V().has('product', 'id', '68719518391')
             ";
-            ResultSet<Product> results = await client.SubmitAsync<Product>(gremlinQuery);
-            Product product = results.First();
+            ResultSet<Dictionary<string, object>> results = await client.SubmitAsync<Dictionary<string, object>>(gremlinQuery);
+            var product = results.First();
 
-            await writeOutputAync($"Read entity:\t{product}");
+            await writeOutputAync($"Read entity id:\t{product[nameof(Product.id)]}");
         }
 
         {
             string category = "gear-surf-surfboards";
             string gremlinQuery = $@"
-                g.V().has('product', 'category', '{category}')
+                g.V().has('product', 'Category', '{category}')
             ";
 
-            ResultSet<Product> results = await client.SubmitAsync<Product>(gremlinQuery);
-            List<Product> entities = results.ToList();
+            ResultSet<Dictionary<string, object>> results = await client.SubmitAsync<Dictionary<string, object>>(gremlinQuery);
+            List<Dictionary<string, object>> entities = results.ToList();
 
             foreach (var entity in entities)
             {
-                await writeOutputAync($"Found entity:\t{entity.id}\t[{entity.Category}]\t{entity.Name}");
+                await writeOutputAync($"Found entity:\t{entity[nameof(Product.id)]}");
             }
         }
     }

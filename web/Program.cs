@@ -7,7 +7,7 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddSingleton<GremlinServer>((_) =>
     new GremlinServer(
-        hostname: $"<azure-cosmos-db-gremlin-endpoint>",
+        hostname: $"<azure-cosmos-db-gremlin-host>",
         port: 443,
         username: "/dbs/cosmicworks/colls/products",
         password: $"<azure-cosmos-db-gremlin-key>",
