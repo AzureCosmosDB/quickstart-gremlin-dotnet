@@ -1,10 +1,14 @@
-namespace Cosmos.Samples.Gremlin.Quickstart.Web.Models;
+using Azure;
+using Azure.Data.Tables;
 
-public record Product
+namespace Cosmos.Samples.Table.Quickstart.Web.Models;
+
+// <model>
+public record Product : ITableEntity
 {
-    public string id { get; set; } = $"{Guid.NewGuid()}";
+    public string RowKey { get; set; } = $"{Guid.NewGuid()}";
 
-    public string Category { get; set; } = String.Empty;
+    public string PartitionKey { get; set; } = String.Empty;
 
     public string Name { get; set; } = String.Empty;
 
@@ -13,4 +17,9 @@ public record Product
     public decimal Price { get; set; } = 0.0m;
 
     public bool Clearance { get; set; } = false;
+
+    public ETag ETag { get; set; } = ETag.All;
+
+    public DateTimeOffset? Timestamp { get; set; }
 };
+// </model>
