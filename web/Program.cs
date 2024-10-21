@@ -1,26 +1,21 @@
-using Gremlin.Net.Driver;
-using Gremlin.Net.Structure.IO.GraphSON;
+using Azure.Data.Tables;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddSingleton<GremlinServer>((_) =>
-    new GremlinServer(
-        hostname: $"<azure-cosmos-db-gremlin-host>",
-        port: 443,
-        username: "/dbs/cosmicworks/colls/products",
-        password: $"<azure-cosmos-db-gremlin-key>",
-        enableSsl: true
-    )
-);
+builder.Services.AddSingleton<TableClient>((_) =>
+{
+    TableServiceClient serviceClient = new(
+        connectionString: "<azure-cosmos-db-table-connection-string>"
+    );
 
-builder.Services.AddSingleton<GremlinClient>((provider) =>
-    new GremlinClient(
-        gremlinServer: provider.GetRequiredService<GremlinServer>(),
-        messageSerializer: new GraphSON2MessageSerializer()
-    )
-);
+    TableClient client = serviceClient.GetTableClient(
+        tableName: "<table-name>"
+    );
+    return client;
+});
 
 builder.Services.AddTransient<IDemoService, DemoService>();
 
