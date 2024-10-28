@@ -1,11 +1,14 @@
 using Azure.Data.Tables;
 using Azure.Identity;
+using Microsoft.Samples.Cosmos.Table.Quickstart.Services;
+using Microsoft.Samples.Cosmos.Table.Quickstart.Services.Interfaces;
+using Microsoft.Samples.Cosmos.Table.Quickstart.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
 
-builder.Services.AddSingleton<TableClient>((_) =>
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+builder.Services.AddSingleton<TableServiceClient>((_) =>
 {
     TableServiceClient serviceClient = new(
         connectionString: "<azure-cosmos-db-table-connection-string>"
@@ -25,11 +28,10 @@ app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+app.UseAntiforgery();
 
-app.UseRouting();
+app.MapStaticAssets();
 
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();
