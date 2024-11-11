@@ -1,18 +1,26 @@
 using Azure;
 using Azure.Data.Tables;
+using Microsoft.Extensions.Options;
 using Microsoft.Samples.Cosmos.Table.Quickstart.Models;
 using Microsoft.Samples.Cosmos.Table.Quickstart.Services.Interfaces;
 
+using Settings = Microsoft.Samples.Cosmos.Table.Quickstart.Models.Settings;
+
 namespace Microsoft.Samples.Cosmos.Table.Quickstart.Services;
 
-public sealed class DemoService(TableServiceClient serviceClient) : IDemoService
+public sealed class DemoService(
+    TableServiceClient serviceClient,
+    IOptions<Settings.Configuration> configurationOptions
+) : IDemoService
 {
+    private readonly Settings.Configuration configuration = configurationOptions.Value;
+
     public string GetEndpoint() => $"{serviceClient.Uri.AbsoluteUri}";
 
     public async Task RunAsync(Func<string, Task> writeOutputAync)
     {
         TableClient client = serviceClient.GetTableClient(
-            tableName: "cosmicworks-products"
+            tableName: configuration.AzureCosmosDB.TableName
         );
 
         await writeOutputAync($"Get table:\t{client.Name}");
@@ -20,7 +28,7 @@ public sealed class DemoService(TableServiceClient serviceClient) : IDemoService
         {
             Product entity = new()
             {
-                RowKey = "68719518391",
+                RowKey = "aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb",
                 PartitionKey = "gear-surf-surfboards",
                 Name = "Yamba Surfboard",
                 Quantity = 10,
@@ -40,7 +48,7 @@ public sealed class DemoService(TableServiceClient serviceClient) : IDemoService
         {
             Product entity = new()
             {
-                RowKey = "68719518371",
+                RowKey = "bbbbbbbb-1111-2222-3333-cccccccccccc",
                 PartitionKey = "gear-surf-surfboards",
                 Name = "Kiama Classic Surfboard",
                 Quantity = 25,
@@ -59,7 +67,7 @@ public sealed class DemoService(TableServiceClient serviceClient) : IDemoService
 
         {
             Response<Product> response = await client.GetEntityAsync<Product>(
-                rowKey: "68719518391",
+                rowKey: "aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb",
                 partitionKey: "gear-surf-surfboards"
             );
 
